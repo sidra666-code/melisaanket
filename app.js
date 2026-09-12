@@ -1,4 +1,3 @@
-```js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
 
 import {
@@ -36,6 +35,8 @@ let myUid = null;
 let countdownTimer = null;
 let voted = false;
 
+
+// HTML güvenliği
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, character => {
     return {
@@ -48,42 +49,63 @@ function escapeHtml(value) {
   });
 }
 
-function getGames() {
-  if (!currentData) return [];
 
-  if (!Array.isArray(currentData.games)) {
+// Firebase'den gelen oyunları düzgün şekilde al
+function getGames() {
+  if (!currentData || !currentData.games) {
     return [];
   }
 
-  return currentData.games.filter(game => {
-    return game &&
-           typeof game === "object" &&
-           String(game.name || "").trim() !== "";
-  });
+  const firebaseGames = currentData.games;
+
+  // Normal Firebase array
+  if (Array.isArray(firebaseGames)) {
+    return firebaseGames.filter(game => {
+      return game &&
+        typeof game === "object" &&
+        String(game.name || "").trim() !== "";
+    });
+  }
+
+  // Firebase map/object olarak geldiyse
+  if (
+    typeof firebaseGames === "object" &&
+    !Array.isArray(firebaseGames)
+  ) {
+    return Object.keys(firebaseGames)
+      .sort((a, b) => Number(a) - Number(b))
+      .map(key => firebaseGames[key])
+      .filter(game => {
+        return game &&
+          typeof game === "object" &&
+          String(game.name || "").trim() !== "";
+      });
+  }
+
+  return [];
 }
 
+
+// Yayın tarihini oluştur
 function getStreamDate(data) {
   if (!data || !data.date || !data.time) {
     return null;
   }
 
-  const [year, month, day] = String(data.date)
-    .split("-")
-    .map(Number);
+  const parts = data.date.split("-").map(Number);
 
-  const [hour, minute] = String(data.time)
-    .split(":")
-    .map(Number);
-
-  if (
-    !year ||
-    !month ||
-    !day ||
-    Number.isNaN(hour) ||
-    Number.isNaN(minute)
-  ) {
+  if (parts.length !== 3) {
     return null;
   }
+
+  const year = parts[0];
+  const month = parts[1];
+  const day = parts[2];
+
+  const timeParts = data.time.split(":").map(Number);
+
+  const hour = timeParts[0] || 0;
+  const minute = timeParts[1] || 0;
 
   return new Date(
     year,
@@ -95,6 +117,8 @@ function getStreamDate(data) {
   );
 }
 
+
+// Tarihi ekrana yaz
 function formatStreamDate(data) {
   const date = getStreamDate(data);
 
@@ -112,6 +136,8 @@ function formatStreamDate(data) {
   }).format(date);
 }
 
+
+// Geri sayım
 function startCountdown() {
   clearInterval(countdownTimer);
 
@@ -175,30 +201,34 @@ function startCountdown() {
   );
 }
 
+
+// Yayın bilgilerini göster
 function renderStream() {
   streamDateEl.textContent =
     formatStreamDate(currentData);
 
   const games = getGames();
 
-  console.log("Firebase'den gelen veriler:", currentData);
-  console.log("Oyunlar:", games);
+  console.log("Firebase oyunları:", currentData.games);
+  console.log("Düzeltilmiş oyun listesi:", games);
 
-  if (games.length === 0) {
+  const mainGame =
+    games.find(game => game.main === true) ||
+    games[0];
+
+  if (mainGame) {
+    mainGameEl.textContent =
+      `${mainGame.emoji || "🎮"} ${mainGame.name || "Oyun belirtilmemiş"}`;
+  } else {
     mainGameEl.textContent =
       "Henüz oyun seçilmedi 🎮";
-  } else {
-    const mainGame =
-      games.find(game => game.main === true) ||
-      games[0];
-
-    mainGameEl.textContent =
-      `${mainGame.emoji || "🎮"} ${mainGame.name}`;
   }
 
   startCountdown();
 }
 
+
+// Oyları hesapla
 function calculateVotes() {
   const games = getGames();
 
@@ -219,15 +249,16 @@ function calculateVotes() {
   return voteCounts;
 }
 
+
+// Anketi göster
 function renderPoll() {
   const games = getGames();
 
   if (games.length === 0) {
-    pollEl.innerHTML = `
-      <div class="loading">
+    pollEl.innerHTML =
+      `<div class="loading">
         Henüz anket seçeneği eklenmedi 💕
-      </div>
-    `;
+      </div>`;
 
     return;
   }
@@ -241,13 +272,12 @@ function renderPoll() {
     );
 
   pollEl.innerHTML = games.map((game, index) => {
+
     const count = voteCounts[index];
 
     const percentage =
       totalVotes > 0
-        ? Math.round(
-            (count / totalVotes) * 100
-          )
+        ? Math.round((count / totalVotes) * 100)
         : 0;
 
     return `
@@ -261,11 +291,15 @@ function renderPoll() {
         </div>
 
         <div class="game-name">
-          ${escapeHtml(game.name)}
+
+          ${escapeHtml(
+            game.name || "İsimsiz oyun"
+          )}
 
           <div class="bar">
             <span style="width:${percentage}%"></span>
           </div>
+
         </div>
 
         <div class="vote-count">
@@ -274,29 +308,37 @@ function renderPoll() {
 
       </div>
     `;
+
   }).join("");
 
+
   if (!voted) {
+
     pollEl
       .querySelectorAll(".poll-option")
       .forEach(option => {
-        option.addEventListener("click", () => {
-          vote(
-            Number(option.dataset.index)
-          );
-        });
+
+        option.addEventListener(
+          "click",
+          () => {
+            vote(
+              Number(option.dataset.index)
+            );
+          }
+        );
+
       });
+
   }
 }
 
+
+// Oy verme
 async function vote(gameIndex) {
+
   const games = getGames();
 
-  if (
-    !myUid ||
-    voted ||
-    games.length === 0
-  ) {
+  if (!myUid || voted) {
     return;
   }
 
@@ -307,15 +349,17 @@ async function vote(gameIndex) {
   const streamKey =
     `${currentData.date || "nodate"}_${currentData.time || ""}`;
 
-  const voterRef = doc(
-    db,
-    "site",
-    "stream",
-    "voters",
-    myUid
-  );
+  const voterRef =
+    doc(
+      db,
+      "site",
+      "stream",
+      "voters",
+      myUid
+    );
 
   try {
+
     voted = true;
 
     localStorage.setItem(
@@ -324,9 +368,13 @@ async function vote(gameIndex) {
     );
 
     await setDoc(voterRef, {
+
       gameIndex: gameIndex,
+
       streamKey: streamKey,
+
       createdAt: serverTimestamp()
+
     });
 
     voteMessageEl.textContent =
@@ -335,7 +383,11 @@ async function vote(gameIndex) {
     renderPoll();
 
   } catch (error) {
-    console.error(error);
+
+    console.error(
+      "Oy verme hatası:",
+      error
+    );
 
     voted = false;
 
@@ -345,9 +397,12 @@ async function vote(gameIndex) {
 
     voteMessageEl.textContent =
       "Oy verilemedi. Lütfen tekrar dene.";
+
   }
 }
 
+
+// Firebase bağlantısı
 signInAnonymously(auth)
 
   .then(userCredential => {
@@ -355,48 +410,74 @@ signInAnonymously(auth)
     myUid =
       userCredential.user.uid;
 
+    console.log(
+      "Anonim kullanıcı:",
+      myUid
+    );
+
+
+    // Yayın bilgilerini dinle
     onSnapshot(
       streamRef,
+
       snapshot => {
 
         if (snapshot.exists()) {
-          currentData = snapshot.data();
+
+          currentData =
+            snapshot.data();
+
         } else {
+
           currentData = {};
+
         }
+
+        console.log(
+          "Firebase'den gelen veriler:",
+          currentData
+        );
 
         renderStream();
 
+
         const streamKey =
           `${currentData.date || "nodate"}_${currentData.time || ""}`;
+
 
         voted =
           localStorage.getItem(
             "melisa_voted_" + streamKey
           ) === "1";
 
-        if (voted) {
-          voteMessageEl.textContent =
-            "Bu yayın için daha önce oy verdin 💕";
-        } else {
-          voteMessageEl.textContent = "";
-        }
+
+        voteMessageEl.textContent =
+          voted
+            ? "Bu yayın için daha önce oy verdin 💕"
+            : "";
+
 
         renderPoll();
+
       },
 
       error => {
+
         console.error(
-          "Firestore stream hatası:",
+          "Stream okuma hatası:",
           error
         );
 
         streamStatusEl.textContent =
           "Yayın bilgileri alınamadı.";
+
       }
     );
 
+
+    // Oyları dinle
     onSnapshot(
+
       collection(
         db,
         "site",
@@ -412,15 +493,20 @@ signInAnonymously(auth)
           );
 
         renderPoll();
+
       },
 
       error => {
+
         console.error(
-          "Oylar alınamadı:",
+          "Oyları okuma hatası:",
           error
         );
+
       }
+
     );
+
   })
 
   .catch(error => {
@@ -435,5 +521,5 @@ signInAnonymously(auth)
 
     voteMessageEl.textContent =
       "Anket sistemi şu anda kullanılamıyor.";
+
   });
-```
