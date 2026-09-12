@@ -1,0 +1,320 @@
+css
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #5c2947;
+  background:
+    radial-gradient(circle at 10% 10%, rgba(255, 170, 210, 0.45), transparent 30%),
+    radial-gradient(circle at 90% 20%, rgba(213, 174, 255, 0.4), transparent 30%),
+    linear-gradient(135deg, #fff5fa, #ffe8f3, #f7edff);
+  overflow-x: hidden;
+}
+
+/* Arka plandaki kalpler */
+
+.hearts {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  color: #ed72a9;
+  font-size: 65px;
+  line-height: 2;
+  word-spacing: 45px;
+  opacity: 0.10;
+  transform: rotate(-12deg) scale(1.2);
+}
+
+/* Ana alan */
+
+.container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 30px 16px 40px;
+}
+
+/* Logo */
+
+.logo {
+  text-align: center;
+  color: #e64d98;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-shadow: 0 3px 12px rgba(230, 77, 152, 0.18);
+}
+
+/* Başlık */
+
+h1 {
+  margin: 12px 0 25px;
+  text-align: center;
+  color: #693452;
+  font-size: 29px;
+  line-height: 1.25;
+}
+
+/* Kartlar */
+
+.card {
+  width: 100%;
+  margin: 16px 0;
+  padding: 24px 20px;
+  border: 2px solid rgba(255, 126, 184, 0.25);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 14px 40px rgba(190, 72, 130, 0.12);
+  backdrop-filter: blur(10px);
+}
+
+/* Bölüm başlıkları */
+
+.section-title {
+  color: #e34d96;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  text-align: center;
+}
+
+/* Tarih */
+
+.stream-date {
+  margin-top: 13px;
+  color: #54263f;
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* Geri sayım */
+
+.countdown {
+  display: table;
+  margin: 15px auto 5px;
+  padding: 11px 20px;
+  border-radius: 19px;
+  color: #e74391;
+  background: #fff0f7;
+  font-size: 40px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  box-shadow: inset 0 0 0 1px rgba(238, 105, 165, 0.08);
+}
+
+/* Yayın durumu */
+
+.status {
+  margin-top: 10px;
+  color: #8d6075;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Ana oyun */
+
+.main-game {
+  margin-top: 15px;
+  color: #713255;
+  font-size: 30px;
+  font-weight: 900;
+  text-align: center;
+}
+
+/* Anket açıklaması */
+
+.poll-description {
+  margin: 9px 0 18px;
+  color: #886476;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Anket seçenekleri */
+
+.poll-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 11px 0;
+  padding: 14px 15px;
+  border: 2px solid #f3c3db;
+  border-radius: 18px;
+  background: #fff5fa;
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+
+.poll-option:hover {
+  border-color: #ed72aa;
+  background: #fff0f7;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(224, 80, 143, 0.10);
+}
+
+.poll-option:active {
+  transform: scale(0.98);
+}
+
+.poll-option.disabled {
+  cursor: default;
+}
+
+.poll-option.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Oyun emojisi */
+
+.game-emoji {
+  flex: 0 0 38px;
+  width: 38px;
+  font-size: 27px;
+  text-align: center;
+}
+
+/* Oyun adı */
+
+.game-name {
+  flex: 1;
+  min-width: 0;
+  color: #63304d;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+/* Oy sayısı */
+
+.vote-count {
+  min-width: 25px;
+  color: #df428b;
+  font-size: 16px;
+  font-weight: 900;
+  text-align: right;
+}
+
+/* Oy yüzdesi çubuğu */
+
+.bar {
+  width: 100%;
+  height: 7px;
+  margin-top: 9px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #f3dce8;
+}
+
+.bar span {
+  display: block;
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #ff78b6, #c88aff);
+  transition: width 0.35s ease;
+}
+
+/* Mesajlar */
+
+.vote-message {
+  min-height: 22px;
+  margin-top: 13px;
+  color: #bd3f79;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.loading {
+  padding: 20px;
+  color: #987185;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Footer */
+
+footer {
+  margin-top: 25px;
+  color: #9c7186;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Mobil */
+
+@media (max-width: 520px) {
+
+  .container {
+    padding: 22px 12px 30px;
+  }
+
+  .logo {
+    font-size: 15px;
+  }
+
+  h1 {
+    margin-top: 11px;
+    font-size: 23px;
+  }
+
+  .card {
+    padding: 21px 15px;
+    border-radius: 22px;
+  }
+
+  .stream-date {
+    font-size: 18px;
+  }
+
+  .countdown {
+    max-width: 100%;
+    padding: 10px 14px;
+    font-size: 30px;
+  }
+
+  .main-game {
+    font-size: 25px;
+  }
+
+  .poll-option {
+    padding: 13px 12px;
+  }
+
+  .game-name {
+    font-size: 15px;
+  }
+}
+
+/* Çok küçük telefonlar */
+
+@media (max-width: 360px) {
+
+  .countdown {
+    font-size: 25px;
+  }
+
+  .main-game {
+    font-size: 22px;
+  }
+
+  .section-title {
+    font-size: 12px;
+  }
+}
