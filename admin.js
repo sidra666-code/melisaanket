@@ -180,7 +180,7 @@ function readGamesFromForm() {
         row
           .querySelector(".emoji")
           .value
-          .trim() || "🎮",
+          .trim() || ":)",
 
       name:
         row
