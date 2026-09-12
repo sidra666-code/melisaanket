@@ -234,12 +234,12 @@ function renderStream() {
   if (mainGame) {
 
     mainGameEl.textContent =
-      `${mainGame.emoji || "🎮"} ${mainGame.name}`;
+      `${mainGame.emoji || ":)"} ${mainGame.name}`;
 
   } else {
 
     mainGameEl.textContent =
-      "Henüz oyun seçilmedi 🎮";
+      "Henüz oyun seçilmedi :)";
   }
 
   startCountdown();
@@ -316,7 +316,7 @@ function renderPoll() {
         >
 
           <div class="game-emoji">
-            ${escapeHtml(game.emoji || "🎮")}
+            ${escapeHtml(game.emoji || ":)")}
           </div>
 
           <div class="game-name">
